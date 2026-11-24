@@ -93,9 +93,9 @@ test('EA bridge token is kept out of renderer IPC and handed to MT5 automaticall
 test('live quote strip binds broker bid, ask and spread to MT5 ticks',async()=>{
  const client=await readFile(new URL('./market-client.js',import.meta.url),'utf8');
  for(const id of ['bidPrice','askPrice','spreadPrice'])assert.ok(html.includes('id="'+id+'"'),'Missing live quote target '+id);
- assert.match(client,/window\.addEventListener\\('market-tick'/);
- assert.match(client,/tick\.bid/);
- assert.match(client,/tick\.ask/);
- assert.match(client,/ask-bid/);
+ assert.ok(client.includes("window.addEventListener('market-tick'"));
+ assert.ok(client.includes('tick.bid'));
+ assert.ok(client.includes('tick.ask'));
+ assert.ok(client.includes('ask-bid'));
  assert.match(client,/spreadPrice/);
 });
