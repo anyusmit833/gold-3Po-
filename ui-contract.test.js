@@ -88,3 +88,14 @@ test('EA bridge token is kept out of renderer IPC and handed to MT5 automaticall
   assert.match(html,/локальный токен передаёт через Common Files/i);
   assert.doesNotMatch(settings,/clipboard|bridgeCopy|bridgeToken/);
 });
+
+
+test('live quote strip binds broker bid, ask and spread to MT5 ticks',async()=>{
+ const client=await readFile(new URL('./market-client.js',import.meta.url),'utf8');
+ for(const id of ['bidPrice','askPrice','spreadPrice'])assert.ok(html.includes('id="'+id+'"'),'Missing live quote target '+id);
+ assert.match(client,/window\\.addEventListener\\('market-tick'/);
+ assert.match(client,/tick\\.bid/);
+ assert.match(client,/tick\\.ask/);
+ assert.match(client,/ask-bid/);
+ assert.match(client,/spreadPrice/);
+});
