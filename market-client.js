@@ -60,3 +60,27 @@ function watchdog(){
 window.addEventListener('mt5-symbol-change',()=>{lastAnalysisAt=0;refreshAnalysis();refreshHealth();});
 window.addEventListener('gold3po-settings',e=>{if(e.detail?.zonesChanged){lastAnalysisAt=0;refreshAnalysis();}});
 refreshHealth();refreshAnalysis();connectStream();window.setInterval(refreshHealth,5000);window.setInterval(watchdog,10000);
+
+
+// Keep the quote strip in sync with the live MT5 quote stream.
+function quoteText(value) {
+ const number=Number(value);
+ return Number.isFinite(number)
+  ? number.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:4})
+  : '—';
+}
+window.addEventListener('market-tick',event=>{
+ const tick=event.detail;
+ if(!tick||tick.source!=='mt5'||tick.symbol!==marketSymbol())return;
+ const bid=Number(tick.bid),ask=Number(tick.ask);
+ if(!Number.isFinite(bid)||!Number.isFinite(ask)||bid<=0||ask<=0||ask<bid)return;
+ const bidNode=document.querySelector('#bidPrice');
+ const askNode=document.querySelector('#askPrice');
+ const spreadNode=document.querySelector('#spreadPrice');
+ if(bidNode)bidNode.textContent=quoteText(bid);
+ if(askNode)askNode.textContent=quoteText(ask);
+ if(spreadNode)spreadNode.textContent=quoteText(ask-bid);
+ const reference=document.querySelector('#referencePrice');
+ const last=Number(tick.last);
+ if(reference&&Number.isFinite(last)&&last>0)reference.textContent=quoteText(last);
+});
